@@ -57,7 +57,14 @@ class Shadertoy:
         for _ in range(frame_count):
             shadertoyGLContext.shadertoy_vars_update(shader, width, height, frame * (1.0 / fps), (1.0 / fps), fps, frame)
             if x is not None:
-                shadertoyGLContext.set_uniform_2f(shader, "offset", (x[frame], 0))
+                # Fix: Handle both single float and list cases
+                if isinstance(x, (list, tuple)):
+                    # If x is a list/array, use the frame index (with bounds checking)
+                    x_value = x[min(frame, len(x) - 1)]
+                else:
+                    # If x is a single float, use it directly
+                    x_value = x
+                shadertoyGLContext.set_uniform_2f(shader, "offset", (x_value, 0))
             if channel_0 != None: shadertoyGLContext.shadertoy_texture_update(textures[0], channel_0, frame)
             if channel_1 != None: shadertoyGLContext.shadertoy_texture_update(textures[1], channel_1, frame)
             if channel_2 != None: shadertoyGLContext.shadertoy_texture_update(textures[2], channel_2, frame)
